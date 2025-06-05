@@ -1,0 +1,115 @@
+<?php
+require_once '../models/Ride.php';
+require_once '../models/Booking.php';
+require_once '../config/database.php';
+
+class RideController {
+    private $ride;
+    private $booking;
+    private $db;
+
+    public function __construct() {
+        $this->ride = new Ride();
+        $this->booking = new Booking();
+        $database = new Database();
+        $this->db = $database->connect();
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ?controller=auth&action=login');
+            exit;
+        }
+    }
+
+    public function create() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $data = [
+                'user_id' => $_SESSION['user_id'],
+                'source' => $_POST['source'],
+                'destination' => $_POST['destination'],
+                'ride_date' => $_POST['ride_date'],
+                'ride_time' => $_POST['ride_time'],
+                'seats_available' => $_POST['seats_available'],
+                'comment' => $_POST['comment'],
+                'ride_type' => $_POST['ride_type']
+            ];
+            if ($this->ride->create($data)) {
+                header('Location: ?controller=user&action=my_rides');
+            } else {
+                $error = "Failed to create ride!";
+                require_once '../views/ride/rides.php';
+            }
+        } else {
+            require_once '../views/ride/rides.php';
+        }
+    }
+
+    public function search() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $source = $_POST['source'];
+            $destination = $_POST['destination'];
+            $ride_date = $_POST['ride_date'];
+            $rides = $this->ride->search($source, $destination, $ride_date);
+            require_once '../views/ride/rides.php';
+        } else {
+            require_once '../views/ride/rides.php';
+        }
+    }
+
+    public function listRides() {
+        $rides = $this->ride->search('', '', date('Y-m-d'));
+        require_once '../views/ride/rides.php';
+    }
+
+    public function book() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $data = [
+                'user_id' => $_SESSION['user_id'],
+                'ride_id' => $_POST['ride_id'],
+                'seats_booked' => $_POST['seats_booked']
+            ];
+            if ($this->booking->book($data)) {
+                header('Location: ?controller=user&action=my_rides');
+            } else {
+                $error = "Booking failed!";
+                $ride = $this->ride->getRideById($_POST['ride_id']);
+                require_once '../views/ride/details.php';
+            }
+        } else {
+            $ride = $this->ride->getRideById($_GET['ride_id']);
+            require_once '../views/ride/details.php';
+        }
+    }
+
+    public function manageBookings() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $booking_id = $_POST['booking_id'];
+            $status = $_POST['status'];
+            if ($status == 'accepted') {
+                $booking = $this->booking->getBookingsByRide($_POST['ride_id']);
+                $seats_booked = 0;
+                foreach ($booking as $b) {
+                    if ($b['id'] == $booking_id) {
+                        $seats_booked = $b['seats_booked'];
+                        break;
+                    }
+                }
+                $this->booking->updateSeats($_POST['ride_id'], $seats_booked);
+            }
+            $this->booking->updateStatus($booking_id, $status);
+            header('Location: ?controller=ride&action=manageBookings&ride_id=' . $_POST['ride_id']);
+        } else {
+            $ride = $this->ride->getRideById($_GET['ride_id']);
+            $bookings = $this->booking->getBookingsByRide($_GET['ride_id']);
+            require_once '../views/ride/manage_bookings.php';
+        }
+    }
+
+    public function cancelRide() {
+        $ride_id = $_GET['ride_id'];
+        if ($this->ride->cancelRide($ride_id, $_SESSION['user_id'])) {
+            header('Location: ?controller=user&action=my_rides');
+        } else {
+            header('Location: ?controller=user&action=my_rides&error=cancel_failed');
+        }
+    }
+}
+?>
