@@ -34,7 +34,6 @@ class Booking {
         return $stmt->execute();
     }
 
-    // For my_rides.php: Fetch booked rides for a user
     public function getBookedRidesByUser($user_id) {
         $query = "SELECT r.*, b.status, b.ride_id 
                   FROM bookings b 
@@ -47,7 +46,6 @@ class Booking {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // For my_connections.php: Fetch incoming requests (for rides posted by the user)
     public function getIncomingRequests($user_id) {
         $query = "SELECT b.*, r.source, r.destination, r.ride_date, r.ride_time, u.name as seeker_name 
                   FROM bookings b 
@@ -61,7 +59,6 @@ class Booking {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // For my_connections.php: Fetch outgoing requests (rides booked by the user)
     public function getOutgoingRequests($user_id) {
         $query = "SELECT b.*, r.source, r.destination, r.ride_date, r.ride_time, u.name as pooler_name 
                   FROM bookings b 
@@ -73,6 +70,16 @@ class Booking {
         $stmt->bindParam(':user_id', $user_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getBookingStatus($ride_id, $user_id) {
+        $query = "SELECT status FROM bookings WHERE ride_id = :ride_id AND user_id = :user_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':ride_id', $ride_id);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+        $booking = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $booking ? $booking['status'] : null;
     }
 }
 ?>

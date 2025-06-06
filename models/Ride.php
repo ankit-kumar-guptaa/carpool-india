@@ -43,6 +43,17 @@ class Ride {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getRideWithUserDetails($id) {
+        $query = "SELECT r.*, u.name, u.phone 
+                  FROM rides r 
+                  JOIN users u ON r.user_id = u.id 
+                  WHERE r.id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function cancelRide($ride_id, $user_id) {
         $query = "DELETE FROM rides WHERE id = :ride_id AND user_id = :user_id";
         $stmt = $this->db->prepare($query);
