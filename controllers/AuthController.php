@@ -1,11 +1,15 @@
 <?php
 require_once '../models/User.php';
+require_once '../config/database.php';
 
 class AuthController {
     private $user;
+    private $db;
 
     public function __construct() {
         $this->user = new User();
+        $database = new Database();
+        $this->db = $database->connect();
     }
 
     public function login() {
@@ -15,7 +19,17 @@ class AuthController {
             $user = $this->user->login($email, $password);
             if ($user) {
                 if ($user['verified'] == 1) {
-                    header('Location: ?controller=user&action=dashboard');
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_name'] = $user['name'];
+                    // Check if there's a ride to redirect to
+                    if (isset($_SESSION['redirect_ride_id'])) {
+                        $ride_id = $_SESSION['redirect_ride_id'];
+                        unset($_SESSION['redirect_ride_id']);
+                        header("Location: ?controller=ride&action=book&ride_id=$ride_id");
+                    } else {
+                        header('Location: ?controller=user&action=dashboard');
+                    }
+                    exit;
                 } else {
                     $error = "Please verify your email first!";
                     require_once '../views/auth/login.php';

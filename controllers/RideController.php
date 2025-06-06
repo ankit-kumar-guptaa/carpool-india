@@ -23,12 +23,16 @@ class RideController {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = [
                 'user_id' => $_SESSION['user_id'],
-                'source' => $_POST['source'],
-                'destination' => $_POST['destination'],
+                'source' => htmlspecialchars($_POST['source']),
+                'destination' => htmlspecialchars($_POST['destination']),
+                'source_lat' => htmlspecialchars($_POST['source_lat']),
+                'source_lon' => htmlspecialchars($_POST['source_lon']),
+                'dest_lat' => htmlspecialchars($_POST['dest_lat']),
+                'dest_lon' => htmlspecialchars($_POST['dest_lon']),
                 'ride_date' => $_POST['ride_date'],
                 'ride_time' => $_POST['ride_time'],
                 'seats_available' => $_POST['seats_available'],
-                'comment' => $_POST['comment'],
+                'comment' => htmlspecialchars($_POST['comment']),
                 'ride_type' => $_POST['ride_type']
             ];
             if ($this->ride->create($data)) {
@@ -46,8 +50,12 @@ class RideController {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $source = $_POST['source'];
             $destination = $_POST['destination'];
+            $source_lat = $_POST['source_lat'] ?? null;
+            $source_lon = $_POST['source_lon'] ?? null;
+            $dest_lat = $_POST['dest_lat'] ?? null;
+            $dest_lon = $_POST['dest_lon'] ?? null;
             $ride_date = $_POST['ride_date'];
-            $rides = $this->ride->search($source, $destination, $ride_date);
+            $rides = $this->ride->search($source, $destination, $ride_date, $source_lat, $source_lon, $dest_lat, $dest_lon);
             require_once '../views/ride/list.php';
         } else {
             require_once '../views/ride/list.php';
@@ -55,12 +63,17 @@ class RideController {
     }
 
     public function listRides() {
-        $rides = $this->ride->search('', '', date('Y-m-d'));
+        // Default search without coordinates for homepage
+        $rides = $this->ride->search('', '', date('Y-m-d'), null, null, null, null);
         require_once '../views/home.php';
     }
 
     public function book() {
         if (!isset($_SESSION['user_id'])) {
+            // Store the ride_id in session to redirect back after login
+            if (isset($_GET['ride_id'])) {
+                $_SESSION['redirect_ride_id'] = $_GET['ride_id'];
+            }
             header('Location: ?controller=auth&action=login');
             exit;
         }
@@ -82,6 +95,8 @@ class RideController {
                 return;
             }
             if ($this->booking->book($data)) {
+                // Clear redirect session after successful booking
+                unset($_SESSION['redirect_ride_id']);
                 header('Location: ?controller=user&action=my_rides');
             } else {
                 $error = "Booking failed!";
@@ -101,6 +116,8 @@ class RideController {
                 return;
             }
             $booking_status = $this->booking->getBookingStatus($ride_id, $_SESSION['user_id']);
+            // Clear redirect session after viewing the details page
+            unset($_SESSION['redirect_ride_id']);
             require_once '../views/ride/details.php';
         }
     }

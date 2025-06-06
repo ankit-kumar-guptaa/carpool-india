@@ -10,15 +10,28 @@ class Ride {
     }
 
     public function create($data) {
-        $query = "INSERT INTO rides (user_id, source, destination, ride_date, ride_time, seats_available, comment, ride_type) 
-                  VALUES (:user_id, :source, :destination, :ride_date, :ride_time, :seats_available, :comment, :ride_type)";
+        $query = "INSERT INTO rides (user_id, source, destination, source_lat, source_lon, dest_lat, dest_lon, ride_date, ride_time, seats_available, comment, ride_type) 
+                  VALUES (:user_id, :source, :destination, :source_lat, :source_lon, :dest_lat, :dest_lon, :ride_date, :ride_time, :seats_available, :comment, :ride_type)";
         $stmt = $this->db->prepare($query);
         return $stmt->execute($data);
     }
 
-    public function search($source, $destination, $ride_date) {
+    public function search($source, $destination, $ride_date, $source_lat = null, $source_lon = null, $dest_lat = null, $dest_lon = null) {
         $query = "SELECT * FROM rides WHERE seats_available > 0 AND ride_date >= :ride_date";
         $params = [':ride_date' => $ride_date];
+
+        if ($source_lat && $source_lon && $dest_lat && $dest_lon) {
+            // Route matching logic using a radius of 50km
+            $query .= " AND (
+                (6371 * acos(cos(radians(:source_lat)) * cos(radians(source_lat)) * cos(radians(source_lon) - radians(:source_lon)) + sin(radians(:source_lat)) * sin(radians(source_lat)))) < 50
+                OR
+                (6371 * acos(cos(radians(:dest_lat)) * cos(radians(dest_lat)) * cos(radians(dest_lon) - radians(:dest_lon)) + sin(radians(:dest_lat)) * sin(radians(dest_lat)))) < 50
+            )";
+            $params[':source_lat'] = $source_lat;
+            $params[':source_lon'] = $source_lon;
+            $params[':dest_lat'] = $dest_lat;
+            $params[':dest_lon'] = $dest_lon;
+        }
 
         if (!empty($source)) {
             $query .= " AND source LIKE :source";
