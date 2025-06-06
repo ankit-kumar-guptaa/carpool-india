@@ -1,9 +1,12 @@
 <?php
 class Database {
-    private $host = 'localhost';
-    private $db_name = 'carpool_india';
-    private $username = 'root'; // Apna MySQL username daal
-    private $password = '';     // Apna MySQL password daal
+    // private $host = 'localhost';
+    // private $db_name = 'carpool_india';
+    // private $username = 'root'; // Apna MySQL username daal
+    // private $password = '';     // Apna MySQL password daal
+    private $db_name = 'u141142577_carpool';
+    private $username = 'u141142577_carpool'; // Apna MySQL username daal
+    private $password = 'Pink@1234!';     // Apna MySQL password daal
     private $conn;
 
     public function connect() {
