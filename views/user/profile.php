@@ -7,7 +7,9 @@
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+     <!-- Include Header -->
+    <?php include '../views/partials/header.php'; ?>
+    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
             <a class="navbar-brand" href="#">Carpool India</a>
             <div class="navbar-nav">
@@ -18,7 +20,7 @@
                 <a class="nav-link" href="?controller=auth&action=logout">Logout</a>
             </div>
         </div>
-    </nav>
+    </nav> -->
     <div class="container mt-5">
         <h2>Your Profile</h2>
         <form method="POST" class="w-50">

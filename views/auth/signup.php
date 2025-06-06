@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
+
+
+ <!-- Include Header -->
+    <?php include '../views/partials/header.php'; ?>
+    
     <div class="container mt-5">
         <h2 class="text-center">Sign Up for Carpool India</h2>
         <?php if (isset($error)) { ?>

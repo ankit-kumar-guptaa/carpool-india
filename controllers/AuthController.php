@@ -32,7 +32,6 @@ class AuthController {
     public function signup() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['otp'])) {
-                // Verify OTP
                 $email = $_SESSION['signup_email'] ?? '';
                 $otp = trim($_POST['otp']);
                 if (empty($email)) {
@@ -44,7 +43,7 @@ class AuthController {
                 if ($this->user->verifyOTP($email, $otp)) {
                     $data = $_SESSION['signup_data'];
                     if ($this->user->signup($data)) {
-                        $this->user->deleteOTP($email); // Delete OTP entry after successful signup
+                        $this->user->deleteOTP($email);
                         unset($_SESSION['signup_data']);
                         unset($_SESSION['signup_email']);
                         header('Location: ?controller=auth&action=login');
@@ -57,7 +56,6 @@ class AuthController {
                     require_once '../views/auth/verify_otp.php';
                 }
             } else {
-                // Generate and send OTP
                 $data = [
                     'name' => $_POST['name'],
                     'email' => $_POST['email'],
@@ -81,8 +79,10 @@ class AuthController {
     }
 
     public function logout() {
+        session_unset();
         session_destroy();
-        header('Location: ?controller=auth&action=login');
+        header('Location: ?controller=ride&action=listRides');
+        exit;
     }
 }
 ?>

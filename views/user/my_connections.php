@@ -6,19 +6,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="#">Carpool India</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="?controller=user&action=dashboard">Dashboard</a>
-                <a class="nav-link" href="?controller=user&action=profile">Profile</a>
-                <a class="nav-link" href="?controller=ride&action=create">Rides</a>
-                <a class="nav-link" href="?controller=user&action=my_rides">My Rides</a>
-                <a class="nav-link" href="?controller=user&action=my_connections">My Connections</a>
-                <a class="nav-link" href="?controller=auth&action=logout">Logout</a>
-            </div>
-        </div>
-    </nav>
+     <!-- Include Header -->
+    <?php include '../views/partials/header.php'; ?>
 
     <div class="container mt-5">
         <h2>My Connections</h2>

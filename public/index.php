@@ -1,37 +1,52 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once '../includes/bootstrap.php';
 
-$controller = $_GET['controller'] ?? 'auth';
-$action = $_GET['action'] ?? 'login';
+$controller = isset($_GET['controller']) ? $_GET['controller'] : 'ride';
+$action = isset($_GET['action']) ? $_GET['action'] : 'listRides';
 
-if ($controller == 'auth') {
-    require_once '../controllers/AuthController.php';
-    $controller = new AuthController();
-    if ($action == 'login') $controller->login();
-    elseif ($action == 'signup') $controller->signup();
-    elseif ($action == 'logout') $controller->logout();
-} elseif ($controller == 'user') {
-    require_once '../controllers/UserController.php';
-    $controller = new UserController();
-    if ($action == 'dashboard') $controller->dashboard();
-    elseif ($action == 'profile') $controller->profile();
-    elseif ($action == 'my_rides') $controller->myRides();
-    elseif ($action == 'my_connections') $controller->myConnections();
-} elseif ($controller == 'ride') {
-    require_once '../controllers/RideController.php';
-    $controller = new RideController();
-    if ($action == 'create') $controller->create();
-    elseif ($action == 'search') $controller->search();
-    elseif ($action == 'book') $controller->book();
-    elseif ($action == 'list') $controller->listRides();
-    elseif ($action == 'manageBookings') $controller->manageBookings();
-    elseif ($action == 'cancel') {
-        $ride_id = $_GET['ride_id'];
-        if ($controller->cancelRide($ride_id)) {
-            header('Location: ?controller=user&action=my_rides');
+if (isset($_SESSION['user_id']) && $controller == 'ride' && $action == 'listRides') {
+    header('Location: ?controller=user&action=dashboard');
+    exit;
+}
+
+switch ($controller) {
+    case 'auth':
+        require_once '../controllers/AuthController.php';
+        $authController = new AuthController();
+        if (method_exists($authController, $action)) {
+            $authController->$action();
         } else {
-            header('Location: ?controller=user&action=my_rides&error=cancel_failed');
+            $authController->login();
         }
-    }
+        break;
+
+    case 'ride':
+        require_once '../controllers/RideController.php';
+        $rideController = new RideController();
+        if (method_exists($rideController, $action)) {
+            $rideController->$action();
+        } else {
+            $rideController->listRides();
+        }
+        break;
+
+    case 'user':
+        require_once '../controllers/UserController.php';
+        $userController = new UserController();
+        if (method_exists($userController, $action)) {
+            $userController->$action();
+        } else {
+            $userController->dashboard();
+        }
+        break;
+
+    default:
+        require_once '../controllers/RideController.php';
+        $rideController = new RideController();
+        $rideController->listRides();
+        break;
 }
 ?>

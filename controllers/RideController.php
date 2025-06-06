@@ -13,13 +13,13 @@ class RideController {
         $this->booking = new Booking();
         $database = new Database();
         $this->db = $database->connect();
+    }
+
+    public function create() {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ?controller=auth&action=login');
             exit;
         }
-    }
-
-    public function create() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = [
                 'user_id' => $_SESSION['user_id'],
@@ -35,10 +35,10 @@ class RideController {
                 header('Location: ?controller=user&action=my_rides');
             } else {
                 $error = "Failed to create ride!";
-                require_once '../views/ride/rides.php';
+                require_once '../views/ride/create.php';
             }
         } else {
-            require_once '../views/ride/rides.php';
+            require_once '../views/ride/create.php';
         }
     }
 
@@ -48,18 +48,22 @@ class RideController {
             $destination = $_POST['destination'];
             $ride_date = $_POST['ride_date'];
             $rides = $this->ride->search($source, $destination, $ride_date);
-            require_once '../views/ride/rides.php';
+            require_once '../views/ride/list.php';
         } else {
-            require_once '../views/ride/rides.php';
+            require_once '../views/ride/list.php';
         }
     }
 
     public function listRides() {
         $rides = $this->ride->search('', '', date('Y-m-d'));
-        require_once '../views/ride/rides.php';
+        require_once '../views/home.php';
     }
 
     public function book() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ?controller=auth&action=login');
+            exit;
+        }
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = [
                 'user_id' => $_SESSION['user_id'],
@@ -80,36 +84,77 @@ class RideController {
     }
 
     public function manageBookings() {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $booking_id = $_POST['booking_id'];
-            $status = $_POST['status'];
-            if ($status == 'accepted') {
-                $booking = $this->booking->getBookingsByRide($_POST['ride_id']);
-                $seats_booked = 0;
-                foreach ($booking as $b) {
-                    if ($b['id'] == $booking_id) {
-                        $seats_booked = $b['seats_booked'];
-                        break;
-                    }
-                }
-                $this->booking->updateSeats($_POST['ride_id'], $seats_booked);
-            }
-            $this->booking->updateStatus($booking_id, $status);
-            header('Location: ?controller=ride&action=manageBookings&ride_id=' . $_POST['ride_id']);
-        } else {
-            $ride = $this->ride->getRideById($_GET['ride_id']);
-            $bookings = $this->booking->getBookingsByRide($_GET['ride_id']);
-            require_once '../views/ride/manage_bookings.php';
-        }
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: ?controller=auth&action=login');
+        exit;
     }
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $booking_id = $_POST['booking_id'];
+        $status = $_POST['status'];
+        if ($status == 'accepted') {
+            $booking = $this->booking->getBookingsByRide($_POST['ride_id']);
+            $seats_booked = 0;
+            foreach ($booking as $b) {
+                if ($b['id'] == $booking_id) {
+                    $seats_booked = $b['seats_booked'];
+                    break;
+                }
+            }
+            $this->ride->updateSeats($_POST['ride_id'], $seats_booked);
+        }
+        $this->booking->updateStatus($booking_id, $status);
+        header('Location: ?controller=ride&action=manageBookings&ride_id=' . $_POST['ride_id']);
+    } else {
+        $ride_id = isset($_GET['ride_id']) ? $_GET['ride_id'] : null;
+        if ($ride_id) {
+            $ride = $this->ride->getRideById($ride_id);
+            if ($ride && $ride['user_id'] == $_SESSION['user_id']) {
+                $bookings = $this->booking->getBookingsByRide($ride_id);
+            } else {
+                $ride = null;
+                $bookings = [];
+            }
+        } else {
+            $ride = null;
+            $bookings = [];
+        }
+        require_once '../views/ride/manage_bookings.php';
+    }
+}
 
     public function cancelRide() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ?controller=auth&action=login');
+            exit;
+        }
         $ride_id = $_GET['ride_id'];
         if ($this->ride->cancelRide($ride_id, $_SESSION['user_id'])) {
             header('Location: ?controller=user&action=my_rides');
         } else {
             header('Location: ?controller=user&action=my_rides&error=cancel_failed');
         }
+    }
+
+    // For my_rides.php: Fetch created and booked rides
+    public function getUserRides() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ?controller=auth&action=login');
+            exit;
+        }
+        $created_rides = $this->ride->getRidesByUser($_SESSION['user_id']);
+        $booked_rides = $this->booking->getBookedRidesByUser($_SESSION['user_id']);
+        require_once '../views/user/my_rides.php';
+    }
+
+    // For my_connections.php: Fetch incoming and outgoing requests
+    public function getUserConnections() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ?controller=auth&action=login');
+            exit;
+        }
+        $incoming_requests = $this->booking->getIncomingRequests($_SESSION['user_id']);
+        $outgoing_requests = $this->booking->getOutgoingRequests($_SESSION['user_id']);
+        require_once '../views/user/my_connections.php';
     }
 }
 ?>

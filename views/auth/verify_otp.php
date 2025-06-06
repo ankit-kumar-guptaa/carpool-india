@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
+
+ <!-- Include Header -->
+    <?php include '../views/partials/header.php'; ?>
+    
     <div class="container mt-5">
         <h2 class="text-center">Verify OTP</h2>
         <p>An OTP has been sent to your email. Please enter it below.</p>
