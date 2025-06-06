@@ -1,7 +1,7 @@
 <?php
-require_once '../models/Ride.php';
-require_once '../models/Booking.php';
-require_once '../config/database.php';
+require_once 'models/Ride.php';
+require_once 'models/Booking.php';
+require_once 'config/database.php';
 
 class RideController {
     private $ride;
@@ -39,10 +39,10 @@ class RideController {
                 header('Location: ?controller=user&action=my_rides');
             } else {
                 $error = "Failed to create ride!";
-                require_once '../views/ride/create.php';
+                require_once 'views/ride/create.php';
             }
         } else {
-            require_once '../views/ride/create.php';
+            require_once 'views/ride/create.php';
         }
     }
 
@@ -56,16 +56,16 @@ class RideController {
             $dest_lon = $_POST['dest_lon'] ?? null;
             $ride_date = $_POST['ride_date'];
             $rides = $this->ride->search($source, $destination, $ride_date, $source_lat, $source_lon, $dest_lat, $dest_lon);
-            require_once '../views/ride/list.php';
+            require_once 'views/ride/list.php';
         } else {
-            require_once '../views/ride/list.php';
+            require_once 'views/ride/list.php';
         }
     }
 
     public function listRides() {
         // Default search without coordinates for homepage
         $rides = $this->ride->search('', '', date('Y-m-d'), null, null, null, null);
-        require_once '../views/home.php';
+        require_once 'views/home.php';
     }
 
     public function book() {
@@ -86,12 +86,12 @@ class RideController {
             $ride = $this->ride->getRideById($_POST['ride_id']);
             if (!$ride) {
                 $error = "Ride not found!";
-                require_once '../views/ride/details.php';
+                require_once 'views/ride/details.php';
                 return;
             }
             if ($data['seats_booked'] > $ride['seats_available']) {
                 $error = "Not enough seats available!";
-                require_once '../views/ride/details.php';
+                require_once 'views/ride/details.php';
                 return;
             }
             if ($this->booking->book($data)) {
@@ -100,25 +100,25 @@ class RideController {
                 header('Location: ?controller=user&action=my_rides');
             } else {
                 $error = "Booking failed!";
-                require_once '../views/ride/details.php';
+                require_once 'views/ride/details.php';
             }
         } else {
             $ride_id = isset($_GET['ride_id']) ? $_GET['ride_id'] : null;
             if (!$ride_id) {
                 $error = "Invalid ride ID!";
-                require_once '../views/ride/details.php';
+                require_once 'views/ride/details.php';
                 return;
             }
             $ride = $this->ride->getRideWithUserDetails($ride_id);
             if (!$ride) {
                 $error = "Ride not found!";
-                require_once '../views/ride/details.php';
+                require_once 'views/ride/details.php';
                 return;
             }
             $booking_status = $this->booking->getBookingStatus($ride_id, $_SESSION['user_id']);
             // Clear redirect session after viewing the details page
             unset($_SESSION['redirect_ride_id']);
-            require_once '../views/ride/details.php';
+            require_once 'views/ride/details.php';
         }
     }
 
@@ -157,7 +157,7 @@ class RideController {
                 $ride = null;
                 $bookings = [];
             }
-            require_once '../views/ride/manage_bookings.php';
+            require_once 'views/ride/manage_bookings.php';
         }
     }
 
@@ -181,7 +181,7 @@ class RideController {
         }
         $created_rides = $this->ride->getRidesByUser($_SESSION['user_id']);
         $booked_rides = $this->booking->getBookedRidesByUser($_SESSION['user_id']);
-        require_once '../views/user/my_rides.php';
+        require_once 'views/user/my_rides.php';
     }
 
     public function getUserConnections() {
@@ -191,7 +191,7 @@ class RideController {
         }
         $incoming_requests = $this->booking->getIncomingRequests($_SESSION['user_id']);
         $outgoing_requests = $this->booking->getOutgoingRequests($_SESSION['user_id']);
-        require_once '../views/user/my_connections.php';
+        require_once 'views/user/my_connections.php';
     }
 }
 ?>

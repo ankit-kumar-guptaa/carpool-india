@@ -1,6 +1,6 @@
 <?php
-require_once '../models/User.php';
-require_once '../config/database.php';
+require_once 'models/User.php';
+require_once 'config/database.php';
 
 class AuthController {
     private $user;
@@ -32,14 +32,14 @@ class AuthController {
                     exit;
                 } else {
                     $error = "Please verify your email first!";
-                    require_once '../views/auth/login.php';
+                    require_once 'views/auth/login.php';
                 }
             } else {
                 $error = "Invalid email or password!";
-                require_once '../views/auth/login.php';
+                require_once 'views/auth/login.php';
             }
         } else {
-            require_once '../views/auth/login.php';
+            require_once 'views/auth/login.php';
         }
     }
 
@@ -50,7 +50,7 @@ class AuthController {
                 $otp = trim($_POST['otp']);
                 if (empty($email)) {
                     $error = "Session expired. Please try signing up again.";
-                    require_once '../views/auth/signup.php';
+                    require_once 'views/auth/signup.php';
                     return;
                 }
 
@@ -63,11 +63,11 @@ class AuthController {
                         header('Location: ?controller=auth&action=login');
                     } else {
                         $error = "Signup failed! Try again.";
-                        require_once '../views/auth/verify_otp.php';
+                        require_once 'views/auth/verify_otp.php';
                     }
                 } else {
                     $error = "Invalid or expired OTP! Please check and try again.";
-                    require_once '../views/auth/verify_otp.php';
+                    require_once 'views/auth/verify_otp.php';
                 }
             } else {
                 $data = [
@@ -81,14 +81,14 @@ class AuthController {
                 if ($this->user->saveOTP($data['email'], $otp) && $this->user->sendOTP($data['email'], $otp)) {
                     $_SESSION['signup_data'] = $data;
                     $_SESSION['signup_email'] = $data['email'];
-                    require_once '../views/auth/verify_otp.php';
+                    require_once 'views/auth/verify_otp.php';
                 } else {
                     $error = "Failed to send OTP! Check your email or try again.";
-                    require_once '../views/auth/signup.php';
+                    require_once 'views/auth/signup.php';
                 }
             }
         } else {
-            require_once '../views/auth/signup.php';
+            require_once 'views/auth/signup.php';
         }
     }
 

@@ -1,6 +1,6 @@
 <?php
-require_once '../config/database.php';
-require_once '../vendor/autoload.php'; // For PHPMailer
+require_once 'config/database.php';
+require_once 'vendor/autoload.php'; // For PHPMailer
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;

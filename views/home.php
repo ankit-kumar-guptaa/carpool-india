@@ -215,7 +215,7 @@
 </head>
 <body>
     <!-- Include Header -->
-    <?php include '../views/partials/header.php'; ?>
+    <?php include 'views/partials/header.php'; ?>
 
     <!-- Hero Section -->
     <section class="hero-section">

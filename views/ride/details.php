@@ -5,11 +5,11 @@
     <title>Carpool India - Ride Details</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <!-- Include Header -->
-    <?php include '../views/partials/header.php'; ?>
+    <?php include 'views/partials/header.php'; ?>
 
     <div class="container mt-5">
         <h2>Ride Details</h2>
@@ -59,6 +59,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/script.js"></script>
+    <script src="assets/js/script.js"></script>
 </body>
 </html>
