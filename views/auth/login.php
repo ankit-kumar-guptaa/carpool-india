@@ -13,6 +13,7 @@
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
+            <a href="/auth/google-login.php" class="btn btn-danger">Login with Google</a>
                 <h2 class="text-center">Login</h2>
                 <?php if (isset($error)) { ?>
                     <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>

@@ -71,3 +71,14 @@ footer .social-icons a {
 footer .social-icons a:hover {
     color: #007bff;
 }
+
+.btn-primary { /* Facebook button */
+    background-color: #4267B2;
+    color: white;
+    margin: 5px;
+}
+.btn-danger { /* Google button */
+    background-color: #DB4437;
+    color: white;
+    margin: 5px;
+}
